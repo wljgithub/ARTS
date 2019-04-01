@@ -1,7 +1,7 @@
 # ARTS
 
 ARTS which is 
-- Algorigthm
+- Algorithm
 - Review
 - Tips
 - Share
