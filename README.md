@@ -1,9 +1,9 @@
 # ARTS
 
 ARTS which is 
-- Algorigthem
+- Algorigthm
 - Review
-- tips
-- share
+- Tips
+- Share
 
-do the above things every week
+Do the above things every week
