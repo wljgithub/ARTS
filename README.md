@@ -138,13 +138,14 @@ equ命令用于定义一个符号(symbol)，符号被命名为常量，可以在
 
 数据命令(data directives)用于为数据段(data segment)申请内存空间，有两种方式可以让内存得以保留，一是单纯地申请一块内存空间，二是申请内存空间并初始化值。第一种方法可以通过RES X命令来实现，X表示对象的大小，下面有一张表格说明了X的大小
 
-Unit | Letter |    
--|-|-
-byte | B |
-word | W | 
-double word |D |
- quad word  |   Q|
-ten bytes   |T   |
+
+|    Unit    | Letter |
+|------------|--------|
+| byte       | B      |
+| word       | W      |
+| doble word | D      |
+| quad word  | Q      |
+| ten bytes           |T        |
 
 第二中方法用DX命令，X代表对象的大小，下面的例子演示了两种方法的不同，通常用一个标签标记内存中的位置，可以通过这个标签来引用这块内存
 
@@ -259,7 +260,7 @@ git commit || echo "Commit failed"
 
 <details>
 	<summary>函数声明与使用</summary>
-	
+
 ```bash	
 get_name() {
   echo "John"
