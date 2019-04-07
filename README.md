@@ -274,7 +274,8 @@ echo "You are $(get_name)"
 
 	<details>
 		<summary>这里写概要</summary>
-		这里写你想收缩起来的内容
+
+		这里写你想收缩起来的内容(注意，最好空一行，否则有些markdown语法会解释失败)
 	</details>
 好了，就这么简单。
 
