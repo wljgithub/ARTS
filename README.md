@@ -249,7 +249,7 @@ echo "${NAME}!"
 
 <details>
 	<summary>条件执行</summary>
-	
+
 ```bash
 git commit && git push
 git commit || echo "Commit failed"
@@ -259,6 +259,7 @@ git commit || echo "Commit failed"
 
 <details>
 	<summary>函数声明与使用</summary>
+	
 ```bash	
 get_name() {
   echo "John"
