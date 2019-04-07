@@ -249,6 +249,7 @@ echo "${NAME}!"
 
 <details>
 	<summary>条件执行</summary>
+	
 ```bash
 git commit && git push
 git commit || echo "Commit failed"
