@@ -12,6 +12,7 @@ Do the above things every week
 # Punch record
 
 - [1st Week](#1)
+- [2st Week](#2)
  
 
 
@@ -302,6 +303,228 @@ echo "You are $(get_name)"
 
 虽然作者说他是AT&T汇编的粉丝，还声称AT&T语法比较有逻辑性，但我怎么看都觉得AT&T语法有些反人类，多了很多没有必要的东西，远不如Intel语法简洁，或许是我刚接触汇编的原因把。	
 
+----
+&nbsp;
 	
 
+### <span id="1">Algorithm</span>
 
+<details>
+	<summary>题目</summary>
+
+```
+70. Climbing Stairs(Easy)
+You are climbing a stair case. It takes n steps to reach to the top.
+
+Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+
+Note: Given n will be a positive integer.
+
+Example 1:
+
+Input: 2
+Output: 2
+Explanation: There are two ways to climb to the top.
+1. 1 step + 1 step
+2. 2 steps
+Example 2:
+
+Input: 3
+Output: 3
+Explanation: There are three ways to climb to the top.
+1. 1 step + 1 step + 1 step
+2. 1 step + 2 steps
+3. 2 steps + 1 step
+```
+
+</details>
+
+<details>
+	<summary>解法</summary>
+
+**思路**
+
+爬楼梯，每次可以上一阶或两阶，当有n阶楼梯时，那么走到第n阶的方法数等于第n-1和第n-2的方法书之和，这其实就是一个fibonacci数列:
+
+f(n) = f(n-1)+f(n-2)
+
+**代码**
+```golang
+func climbStairs(n int) int {
+    if n<=2{
+        return n
+    }
+    a,b:=1,2
+    
+    for i:=0;i<n-2;i++{
+        a,b=b,a+b
+    }
+    return b
+    
+}
+```
+</details>
+
+### Review
+
+这周忙于找工作，和赶毕业论文，弄得焦头烂额。本想拖到周日再写，但是周日还要面试，趁今晚有点空闲时间就写了，本周的review打算翻译与linux 系统日志相关的文章。
+
+我们在学习linux过程中都某些分水岭，比如刚开始基础linux的时候只会简单的命令，如 ls、cd、ping 等简单命令，后来慢慢开始了解如何关闭一个进程，如何创建一个用户，如何更改文件的权限等。但我们肯定不会只满足于此，而如果想向下一个阶段迈进，达到能独立编写shell脚本，处理一些日常任务，就需要系统地接触linux中各方面的知识。分享一个系统地学习linux基础的网站,[点击即可](https://linuxjourney.com/)。
+
+这个网站从最基本的文件系统操作，到简单的字符串处理，再到内核相关的知识都有涵盖，而且每一个重要的知识点都专门分一个主题来介绍，这周打算翻译系统日志部分
+
+<details>
+	<summary>点击查看翻译内容</summary>
+
+### 1. 系统日志
+
+你系统中的后台服务、内核、守护进程无时不刻都在运行，自然也会产生一些数据以日志的形式保存在系统中，它以人类可读的日记方式记载着操作系统中发生的事件，而这些数据通常保存在 /var目录下，/var目录保存着可变化的数据，比如日志。
+
+这些日志信息是如何从系统中获取的呢？它是由一个叫 "syslog"的服务把这些信息发送给系统日志器(system logger)
+
+syslog通常包含许多组件，其中一个重要的组件是"syslogd"守护进程(更新的linux发行版中使用rsyslogd)，它等待系统产生的事件消息，并过滤出它想要的，然后将其以文件的格式存起来或发送给终端，也可能会将它丢弃。
+
+你可能会觉得这个系统日志器会统一存放并管理日志，但恰恰相反，你会看到许多应用都有自身的日志规则并生成不同的日志文件，不过通用格式的日志都会包含时间戳(timestamp)和日志细节
+
+这里从日志中摘抄一行作为例子：
+```
+
+pete@icebox:~$ less /var/log/syslog
+
+Jan 27 07:41:32 icebox anacron[4650]: Job `cron.weekly' started
+```
+
+可以看到cron服务在1月27 07:41:32运行cron.weekly，当然你也可以查看收集在/var/log/syslog中的所有日志信息
+
+### 2. syslog服务
+
+syslog服务管理日志和将日志发送到系统日志器(system logger)中，Rsyslog则是syslog的升级版，大多数linux发行版应该都会使用这个升级版，所有syslog所收集的日志都可以在/var/log/syslog中找到(除了认证信息)。
+
+为了找出系统日志器(system logger)所维护的文件，得查找/etc/rsyslog.d中配置文件
+
+```
+pete@icebox:~$ less /etc/rsyslog.d/50-default.conf 
+
+# First some standard log files.  Log by facility.
+
+#
+
+auth,authpriv.*                 /var/log/auth.log
+
+*.*;auth,authpriv.none          -/var/log/syslog
+
+#cron.*                         /var/log/cron.log
+
+#daemon.*                       -/var/log/daemon.log
+
+kern.*                          -/var/log/kern.log
+
+#lpr.*                          -/var/log/lpr.log
+
+mail.*                          -/var/log/mail.log
+
+#user.*                         -/var/log/user.log
+```
+
+文件中的日志规则代表，左边的选择器将日志输出到到右边的文件中。有一点需要注意，并不是所有的应用或服务都是用rsyslog管理它们的日志，所以如果你想知道他们具体使用什么管理日志，得在这个目录里找
+
+让我们来看一下日志是如何运作的，你可以手动的用日志器命令发送一条日志：
+
+```
+logger -s Hello
+```
+好了，你可以查看 /var/log/syslog文件，你会发现多了一条日志。
+
+### 3. 通用日志(general logging)
+
+系统中包含了许多的日志文件，很多重要的日志都放在/sys/log目录下，但我们并不会分析所有这些日志文件，我们选择几个主要的来讨论。
+
+有两种通用的日志文件可以查看系统正在做的事
+
+**/var/log/messages**
+这个日志包含了非紧急(non-critical)、非调试(not-debug)消息，包括启动(bootup)、验证(auth)、计划任务(cron)、守护进程(daemon)中所输出的日志,可以帮助你查看你的机器是如何运作的
+
+**/var/log/syslog**
+这个文件包含了除验证(auth)外的所有消息，对于在你机器上的错误调试非常有用。
+
+这两个日志文件对于追查错误来说，已经足够了。但是，如果您只想查看特定的日志组件，那么也会有单独的日志
+
+### 4. 内核日志
+
+**/var/log/dmesg**
+
+在启动时，系统会记录内核缓冲区中的信息，它展示了系统在启动时硬件驱动、内核和内核状态的一些信息。你可以在/var/log/dmesg 文件中找到这些信息，这些信息每次在启动的时候都会被刷新。或许你现在暂时用不上，但当你遇到某些与启动相关或硬件驱动的问题时，这个日志就派上用场了，你甚至可以用dmesg 命令查看这些信息。
+
+**/var/log/kern.log**
+
+另一你可以查看内核信息的文件是/var/log/kern.log ，它记录了系统中的事件与内核信息，也包括dmesg的输出。
+
+
+### 5. 验证日志(Authentication Logging)
+
+当你登录出现问题时，身份验证日志可以帮到你。
+
+**/var/log/auth.log** 这个文件包含了系统授权日志，如用户登录和使用的认证方法。
+
+样例：
+
+	Jan 31 10:37:50 icebox pkexec: pam_unix(polkit-1:session): session opened for user root by (uid=1000)
+
+
+
+### 6. 管理日志文件
+
+日志文件生成了许多数据，这些数据被存储在磁盘中，同时也带来了许多问题。大多数情况下，我们只想查看更新的日志，同时更高效地管理磁盘空间。如何做到这点呢?答案是： logrotate
+
+logrotate 工具为我们提供了日志管理，它有一个配置文件允许我们指定数目或指定哪些日志需要保存，也可以压缩日志节省存储空间。logrotate工具作为计划任务(cron)每天运行一次，配置文件可在/etc/logrotate.d.中找到。
+
+虽然还有其他管理日志的工具，但logrotate是最常用的一个。
+
+
+</details>
+
+### Tips
+
+分享一个有意思的技巧，系统中(包含Window和类UNIX)的hosts文件。
+
+我们都知道当在浏览器输入域名的时候，浏览器会调用系统的接口向DNS查询对应的IP，但其实在DNS查询之前，它是先查找hosts文件中域名映射的IP，也就是说hosts文件的优先级是比DNS查询要高的。
+
+那么这有什么用呢？你想啊，如果我把百度的域名 www.baidu.com 映射到0.0.0.0，那就意味着你每次访问百度都会映射到一个无效的IP，自然就上不了网了。
+
+你可以用来搞怪别人，写一个脚本把一些主流的域名都映射到无效的IP，然后他会发现怎么突然上不了网了，但是我建议你在干这个之前先买好保险。
+
+你甚至可以用来屏蔽一些广告，把一些广告的域名映射到一个无效的IP中，这样每次都加载失败自然就等于把广告屏蔽了。
+
+下面以Ubuntu为例，以管理员权限权限打开/etc/hosts文件(因为文件权限只允许管理员写入)：
+
+	vim /etc/hosts
+
+然后你会看到类型的内容:
+
+```
+127.0.0.1	localhost
+127.0.1.1	jack-VirtualBox
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+```
+
+然后在第三行下添加:
+
+	0.0.0.0   www.baidu.com
+
+用vim保存退出的是记得带上！符号，即: wq!  (因为文件权限只允许管理员写入)
+
+好了，然后你上一下百度，发现上不了，^_^.
+
+### Share
+
+本周的Share打算分享一位网友的博客，他把Leetcode上大部分题都刷完了，而且很多题还给了几种解法并详细地分析思路，然后做一个汇总。我其实真的很佩服这些人，上千道算法题，即使每天刷一道，而且得连续不断地刷，这样也要两年多的时间。这还没完，还把解过的题都整理起来，附上解题思路，这个过程想想都觉得十分不容易。
+
+我特别的佩服这些人的毅力，他们一直都是我学习的榜样，而且我也打算要这么干，md,想想都刺激。
+
+好了，链接在这，[点就好](https://www.cnblogs.com/grandyang/p/4606334.html)
