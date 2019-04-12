@@ -13,10 +13,18 @@ Do the above things every week
 
 - [1st Week](#1)
 - [2st Week](#2)
+
+这个目录时用来跳转到第N周的打卡记录(得先展开才能跳转)，防止以后内容多了浏览起来麻烦。
+
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+
  
 
 <details>
-	<summary>1st week</summary>
+	<summary>1st week(点击即可展开)</summary>
 	
 ### <span id="1">Algorithm</span>
 
