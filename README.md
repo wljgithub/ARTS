@@ -15,7 +15,9 @@ Do the above things every week
 - [2st Week](#2)
  
 
-
+<details>
+	<summary>1st week</summary>
+	
 ### <span id="1">Algorithm</span>
 
 ```
@@ -302,11 +304,12 @@ echo "You are $(get_name)"
 
 
 虽然作者说他是AT&T汇编的粉丝，还声称AT&T语法比较有逻辑性，但我怎么看都觉得AT&T语法有些反人类，多了很多没有必要的东西，远不如Intel语法简洁，或许是我刚接触汇编的原因把。	
+</details>
 
-----
-&nbsp;
 	
-
+<details>
+	<summary>2st week</summary>
+	
 ### <span id="1">Algorithm</span>
 
 <details>
@@ -528,3 +531,4 @@ ff02::2 ip6-allrouters
 我特别的佩服这些人的毅力，他们一直都是我学习的榜样，而且我也打算要这么干，md,想想都刺激。
 
 好了，链接在这，[点就好](https://www.cnblogs.com/grandyang/p/4606334.html)
+</details>
