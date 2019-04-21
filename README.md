@@ -13,6 +13,7 @@ Do the above things every week
 
 - [1st Week](#1)
 - [2st Week](#2)
+- [3st week](#3)
 
 这个目录是用来跳转到第N周的打卡记录(得先展开才能跳转)，防止以后内容多了浏览起来麻烦。
 
@@ -540,3 +541,839 @@ ff02::2 ip6-allrouters
 
 好了，链接在这，[点就好](https://www.cnblogs.com/grandyang/p/4606334.html)
 </details>
+
+<details>
+	
+<summary>3st week</summary>
+
+### <span id="3">Algorithm</span>
+
+<details>
+
+<summary>题目</summary>
+
+```
+Given an array nums and a value val, remove all instances of that value in-place and return the new length.
+
+Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+
+The order of elements can be changed. It doesn't matter what you leave beyond the new length.
+
+Example 1:
+
+Given nums = [3,2,2,3], val = 3,
+
+Your function should return length = 2, with the first two elements of nums being 2.
+
+It doesn't matter what you leave beyond the returned length.
+Example 2:
+
+Given nums = [0,1,2,2,3,0,4,2], val = 2,
+
+Your function should return length = 5, with the first five elements of nums containing 0, 1, 3, 0, and 4.
+
+Note that the order of those five elements can be arbitrary.
+
+It doesn't matter what values are set beyond the returned length.
+```
+</details>
+
+<details>
+
+<summary>解法</summary>
+
+要求in-place操作移除给定数组上的指定元素，很明显用双指针的思想，遍历一遍即可。用一个"指针"记录非val元素的索引，一个"指针"遍历整个数组，如果遇到非val元素，两个"指针"交换位置即可，时间复杂度O(n)
+
+```golang
+func removeElement(nums []int, val int) int {
+    if len(nums)<1{
+        return 0
+    }
+    index:=-1
+    
+    for i:=0;i<len(nums);i++{
+        if nums[i]!=val{
+            index++
+            nums[i],nums[index]=nums[index],nums[i]
+        }
+        
+    }
+    return index+1
+    
+}
+```
+
+</details>
+
+### Review
+
+这周给找工作的事弄得有些迷茫了，面了两家结果都不太理想，算了车到山前必有路。
+
+本周翻译与系统初始化相关的一部分内容
+
+<details>
+	
+<summary>翻译内容(点击即可展开)</summary>
+
+英语还没过四级，翻译水平有限，轻喷。
+
+### System V 概述
+
+init主要作用是用来启动或关闭系统中主要的进程，在 Linux中主要有三种init的实现，分别是System V, Upstart 和 systemd，在本节中将介绍最传统的init版本，也叫System V init或Sys V (发'System Five'的音)
+
+鉴别你系统中是否使用System V init很简单，如果你的系统中包含 /etc/initab 文件，则说明很有可能就是使用该版本的init。
+
+Sys V 按顺序地启动或关闭进程，比如你想启动foot-a 和foot-b进程，必须确保foot-a已经运行了才能执行foot-b。Sys V是以脚本的形式执行这些操作，你可以编写自己的脚本或使用系统内置的。(直译过来感觉有些啰嗦，就删了部分内容)
+
+使用init的这种实现的优点是，解决依赖关系相对容易，但一次只能启动或关闭一个进程，执行foo-b前得先执行foo-a，所以性能并不理想。
+
+当运行Sys V时，机器的状态由运行级别定义，运行级别被设定为0-6。这些模式在不同的发行版上有些不同，但大致如下:
+
+	0: 关闭(Shutdown)
+	1: (单一用户模式)Single User Mode
+	2: (无网络多用户模式)Multiuser mode without networking
+	3: (有网络多用户模式)Multiuser mode with networking
+	4: (未使用)Unused
+	5: (带图形界面有网络的多用户模式)Multiuser mode with networking and GUI
+	6: (重启)Reboot
+
+当你的系统启动时，它会查看你所运行的级别，并执行位于该运行级别配置中的脚本。这些脚本位于 /etc/rc.d/rc[运行级别数字].d/ or /etc/init.d下，以S(start)和K(kill)开头的脚本名则代表启动和关闭，字符旁的数字代表运行在其中的序列，比如:
+
+	pete@icebox:/etc/rc.d/rc0.d$ ls
+
+	K10updates  K80openvpn        
+
+表明当运行级别切换到0时，机器将尝试运行脚本终止 updates和openvpn服务。你可以在/etc/inital文件中查看机器启动时的运行级别，当然也可以改变默认的运行级别。
+
+有一点需要注意，Sys V正在缓慢地被取代，或许不是今天或几年后。但是即便被取代，你也会看到运行级别这个概念出现在其他init的实现中，这主要是为了支持那些仅使用System V init脚本启动或停止的服务
+
+### System V 服务
+
+你可以使用许多命令行工具来管理 System V 服务
+
+列出所有服务
+
+	service --status-all
+
+开启一个服务
+	
+	sudo service  networking start
+
+停止一个服务
+
+	sudo service networking stop
+
+重启一个服务
+
+	sudo service networking restart
+
+这些命令并非只针对System V服务有效，同时也可以用来管理Upstart 服务。因为linux正在尝试从传统的Sys V init 脚本中迁移，所以还得需要一些工具帮助它过渡。
+
+### Upstart 概述
+
+Upstart按标准(canonical)开发，所有曾经有一段时间是ubuntu上的init实现。但是现代化的Ubuntu init实现时systemd。
+
+Upstart被创造来改善了Sys V中的某些问题，比如严格的启动过程、阻塞任务等。Upstart的事件和工作驱动模型(job driven model)允许它在事件发生时对事件做出响应
+
+鉴别你系统中是否使用Upstart很简单，只要看是否存在/usr/share/upstart目录即可
+
+jobs是upstart 执行的操作，事件(events)是从其他进程接收的消息用于触发作业(jobs)，下面来看一下jobs列表与它的配置
+
+```
+
+pete@icebox:~$ ls /etc/init
+
+acpid.conf                   mountnfs.sh.conf
+
+alsa-restore.conf            mtab.sh.conf
+
+alsa-state.conf              networking.conf
+
+alsa-store.conf              network-interface.conf
+
+anacron.conf                 network-interface-container.conf
+```
+
+在job的配置里，包含了如何开始和什么时候开启job的信息
+
+比如在networking.conf文件中，可以简单的描述为
+
+```
+
+start on runlevel [235]
+
+stop on runlevel [0]
+```
+
+这意味着在运行级别2、3、5时会开启networking设置，在运行级别为0时关闭它。当查看不同地job配置文件时，会有许多种编写配置文件的方式.
+
+
+Upstart工作流程
+
+1. 首先从/etc/init文件中加载job配置
+2. 一旦启动事件发生，它将运行由事件触发的作业(job)
+3. 这些作业(job)会产生新的事件，而新的事件又会触发更多的作业(job)
+4. upstart持续地重复这个过程，直到执行完待完成的作业
+
+
+</details>
+
+
+
+### Tips
+
+本周Tips分享如何在Ubuntu下更好软件源的方式，这是以前写的一篇[文章](https://segmentfault.com/a/1190000017244124)。 这几天没在状态，没怎么输入，都在翻老底了。
+
+### Share
+
+本周要分享一段代码，或许与最初陈皓前辈所提的ARTS标准有些偏移，但我觉得很有意思，所以拿出来分享一下。
+
+<details>
+<summary>shell版俄罗斯方块代码</summary>
+
+```bash
+#!/bin/bash
+ 
+# Tetris Game
+# 10.21.2003 xhchen<[email]xhchen@winbond.com.tw[/email]>
+ 
+#APP declaration
+APP_NAME="${0##*[\\/]}"
+APP_VERSION="1.0"
+ 
+ 
+#颜色定义
+cRed=1
+cGreen=2
+cYellow=3
+cBlue=4
+cFuchsia=5
+cCyan=6
+cWhite=7
+colorTable=($cRed $cGreen $cYellow $cBlue $cFuchsia $cCyan $cWhite)
+ 
+#位置和大小
+iLeft=3
+iTop=2
+((iTrayLeft = iLeft + 2))
+((iTrayTop = iTop + 1))
+((iTrayWidth = 10))
+((iTrayHeight = 15))
+ 
+#颜色设置
+cBorder=$cGreen
+cScore=$cFuchsia
+cScoreValue=$cCyan
+ 
+#控制信号
+#改游戏使用两个进程，一个用于接收输入，一个用于游戏流程和显示界面;
+#当前者接收到上下左右等按键时，通过向后者发送signal的方式通知后者。
+sigRotate=25
+sigLeft=26
+sigRight=27
+sigDown=28
+sigAllDown=29
+sigExit=30
+ 
+#七中不同的方块的定义
+#通过旋转，每种方块的显示的样式可能有几种
+box0=(0 0 0 1 1 0 1 1)
+box1=(0 2 1 2 2 2 3 2 1 0 1 1 1 2 1 3)
+box2=(0 0 0 1 1 1 1 2 0 1 1 0 1 1 2 0)
+box3=(0 1 0 2 1 0 1 1 0 0 1 0 1 1 2 1)
+box4=(0 1 0 2 1 1 2 1 1 0 1 1 1 2 2 2 0 1 1 1 2 0 2 1 0 0 1 0 1 1 1 2)
+box5=(0 1 1 1 2 1 2 2 1 0 1 1 1 2 2 0 0 0 0 1 1 1 2 1 0 2 1 0 1 1 1 2)
+box6=(0 1 1 1 1 2 2 1 1 0 1 1 1 2 2 1 0 1 1 0 1 1 2 1 0 1 1 0 1 1 1 2)
+#所有其中方块的定义都放到box变量中
+box=(${box0[@]} ${box1[@]} ${box2[@]} ${box3[@]} ${box4[@]} ${box5[@]} ${box6[@]})
+#各种方块旋转后可能的样式数目
+countBox=(1 2 2 2 4 4 4)
+#各种方块再box数组中的偏移
+offsetBox=(0 1 3 5 7 11 15)
+ 
+#每提高一个速度级需要积累的分数
+iScoreEachLevel=50        #be greater than 7
+ 
+#运行时数据
+sig=0                #接收到的signal
+iScore=0        #总分
+iLevel=0        #速度级
+boxNew=()        #新下落的方块的位置定义
+cBoxNew=0        #新下落的方块的颜色
+iBoxNewType=0        #新下落的方块的种类
+iBoxNewRotate=0        #新下落的方块的旋转角度
+boxCur=()        #当前方块的位置定义
+cBoxCur=0        #当前方块的颜色
+iBoxCurType=0        #当前方块的种类
+iBoxCurRotate=0        #当前方块的旋转角度
+boxCurX=-1        #当前方块的x坐标位置
+boxCurY=-1        #当前方块的y坐标位置
+iMap=()                #背景方块图表
+ 
+#初始化所有背景方块为-1, 表示没有方块
+for ((i = 0; i < iTrayHeight * iTrayWidth; i++)); do iMap[$i]=-1; done
+ 
+ 
+#接收输入的进程的主函数
+function RunAsKeyReceiver()
+{
+        local pidDisplayer key aKey sig cESC sTTY
+ 
+        pidDisplayer=$1
+        aKey=(0 0 0)
+ 
+        cESC=`echo -ne "\033"`
+        cSpace=`echo -ne "\040"`
+ 
+        #保存终端属性。在read -s读取终端键时，终端的属性会被暂时改变。
+        #如果在read -s时程序被不幸杀掉，可能会导致终端混乱，
+        #需要在程序退出时恢复终端属性。
+        sTTY=`stty -g`
+ 
+        #捕捉退出信号
+        trap "MyExit;" INT TERM
+        trap "MyExitNoSub;" $sigExit
+ 
+        #隐藏光标
+        echo -ne "\033[?25l"
+ 
+ 
+        while :
+        do
+                #读取输入。注-s不回显，-n读到一个字符立即返回
+                read -s -n 1 key
+ 
+                aKey[0]=${aKey[1]}
+                aKey[1]=${aKey[2]}
+                aKey[2]=$key
+                sig=0
+ 
+                #判断输入了何种键
+                if [[ $key == $cESC && ${aKey[1]} == $cESC ]]
+                then
+                        #ESC键
+                        MyExit
+                elif [[ ${aKey[0]} == $cESC && ${aKey[1]} == "[" ]]
+                then
+                        if [[ $key == "A" ]]; then sig=$sigRotate        #<向上键>
+                        elif [[ $key == "B" ]]; then sig=$sigDown        #<向下键>
+                        elif [[ $key == "D" ]]; then sig=$sigLeft        #<向左键>
+                        elif [[ $key == "C" ]]; then sig=$sigRight        #<向右键>
+                        fi
+                elif [[ $key == "W" || $key == "w" ]]; then sig=$sigRotate        #W, w
+                elif [[ $key == "S" || $key == "s" ]]; then sig=$sigDown        #S, s
+                elif [[ $key == "A" || $key == "a" ]]; then sig=$sigLeft        #A, a
+                elif [[ $key == "D" || $key == "d" ]]; then sig=$sigRight        #D, d
+                elif [[ "[$key]" == "[]" ]]; then sig=$sigAllDown        #空格键
+                elif [[ $key == "Q" || $key == "q" ]]                        #Q, q
+                then
+                        MyExit
+                fi
+ 
+                if [[ $sig != 0 ]]
+                then
+                        #向另一进程发送消息
+                        kill -$sig $pidDisplayer
+                fi
+        done
+}
+ 
+#退出前的恢复
+function MyExitNoSub()
+{
+        local y
+ 
+        #恢复终端属性
+        stty $sTTY
+        ((y = iTop + iTrayHeight + 4))
+ 
+        #显示光标
+        echo -e "\033[?25h\033[${y};0H"
+        exit
+}
+ 
+ 
+function MyExit()
+{
+        #通知显示进程需要退出
+        kill -$sigExit $pidDisplayer
+ 
+        MyExitNoSub
+}
+ 
+ 
+#处理显示和游戏流程的主函数
+function RunAsDisplayer()
+{
+        local sigThis
+        InitDraw
+ 
+        #挂载各种信号的处理函数
+        trap "sig=$sigRotate;" $sigRotate
+        trap "sig=$sigLeft;" $sigLeft
+        trap "sig=$sigRight;" $sigRight
+        trap "sig=$sigDown;" $sigDown
+        trap "sig=$sigAllDown;" $sigAllDown
+        trap "ShowExit;" $sigExit
+ 
+        while :
+        do
+                #根据当前的速度级iLevel不同，设定相应的循环的次数
+                for ((i = 0; i < 21 - iLevel; i++))
+                do
+                        sleep 0.02
+                        sigThis=$sig
+                        sig=0
+ 
+                        #根据sig变量判断是否接受到相应的信号
+                        if ((sigThis == sigRotate)); then BoxRotate;        #旋转
+                        elif ((sigThis == sigLeft)); then BoxLeft;        #左移一列
+                        elif ((sigThis == sigRight)); then BoxRight;        #右移一列
+                        elif ((sigThis == sigDown)); then BoxDown;        #下落一行
+                        elif ((sigThis == sigAllDown)); then BoxAllDown;        #下落到底
+                        fi
+                done
+                #kill -$sigDown $$
+                BoxDown        #下落一行
+        done
+}
+ 
+ 
+#BoxMove(y, x), 测试是否可以把移动中的方块移到(x, y)的位置, 返回0则可以, 1不可以
+function BoxMove()
+{
+        local j i x y xTest yTest
+        yTest=$1
+        xTest=$2
+        for ((j = 0; j < 8; j += 2))
+        do
+                ((i = j + 1))
+                ((y = ${boxCur[$j]} + yTest))
+                ((x = ${boxCur[$i]} + xTest))
+                if (( y < 0 || y >= iTrayHeight || x < 0 || x >= iTrayWidth))
+                then
+                        #撞到墙壁了
+                        return 1
+                fi
+                if ((${iMap[y * iTrayWidth + x]} != -1 ))
+                then
+                        #撞到其他已经存在的方块了
+                        return 1
+                fi
+        done
+        return 0;
+}
+ 
+ 
+#将当前移动中的方块放到背景方块中去,
+#并计算新的分数和速度级。(即一次方块落到底部)
+function Box2Map()
+{
+        local j i x y xp yp line
+ 
+        #将当前移动中的方块放到背景方块中去
+        for ((j = 0; j < 8; j += 2))
+        do
+                ((i = j + 1))
+                ((y = ${boxCur[$j]} + boxCurY))
+                ((x = ${boxCur[$i]} + boxCurX))
+                ((i = y * iTrayWidth + x))
+                iMap[$i]=$cBoxCur
+        done
+ 
+        #消去可被消去的行
+        line=0
+        for ((j = 0; j < iTrayWidth * iTrayHeight; j += iTrayWidth))
+        do
+                for ((i = j + iTrayWidth - 1; i >= j; i--))
+                do
+                        if ((${iMap[$i]} == -1)); then break; fi
+                done
+                if ((i >= j)); then continue; fi
+ 
+                ((line++))
+                for ((i = j - 1; i >= 0; i--))
+                do
+                        ((x = i + iTrayWidth))
+                        iMap[$x]=${iMap[$i]}
+                done
+                for ((i = 0; i < iTrayWidth; i++))
+                do
+                        iMap[$i]=-1
+                done
+        done
+ 
+        if ((line == 0)); then return; fi
+ 
+        #根据消去的行数line计算分数和速度级
+        ((x = iLeft + iTrayWidth * 2 + 7))
+        ((y = iTop + 11))
+        ((iScore += line * 2 - 1))
+        #显示新的分数
+        echo -ne "\033[1m\033[3${cScoreValue}m\033[${y};${x}H${iScore}         "
+        if ((iScore % iScoreEachLevel < line * 2 - 1))
+        then
+                if ((iLevel < 20))
+                then
+                        ((iLevel++))
+                        ((y = iTop + 14))
+                        #显示新的速度级
+                        echo -ne "\033[3${cScoreValue}m\033[${y};${x}H${iLevel}        "
+                fi
+        fi
+        echo -ne "\033[0m"
+ 
+ 
+        #重新显示背景方块
+        for ((y = 0; y < iTrayHeight; y++))
+        do
+                ((yp = y + iTrayTop + 1))
+                ((xp = iTrayLeft + 1))
+                ((i = y * iTrayWidth))
+                echo -ne "\033[${yp};${xp}H"
+                for ((x = 0; x < iTrayWidth; x++))
+                do
+                        ((j = i + x))
+                        if ((${iMap[$j]} == -1))
+                        then
+                                echo -ne "  "
+                        else
+                                echo -ne "\033[1m\033[7m\033[3${iMap[$j]}m\033[4${iMap[$j]}m[]\033[0m"
+                        fi
+                done
+        done
+}
+ 
+ 
+#下落一行
+function BoxDown()
+{
+        local y s
+        ((y = boxCurY + 1))        #新的y坐标
+        if BoxMove $y $boxCurX        #测试是否可以下落一行
+        then
+                s="`DrawCurBox 0`"        #将旧的方块抹去
+                ((boxCurY = y))
+                s="$s`DrawCurBox 1`"        #显示新的下落后方块
+                echo -ne $s
+        else
+                #走到这儿, 如果不能下落了
+                Box2Map                #将当前移动中的方块贴到背景方块中
+                RandomBox        #产生新的方块
+        fi
+}
+ 
+#左移一列
+function BoxLeft()
+{
+        local x s
+        ((x = boxCurX - 1))
+        if BoxMove $boxCurY $x
+        then
+                s=`DrawCurBox 0`
+                ((boxCurX = x))
+                s=$s`DrawCurBox 1`
+                echo -ne $s
+        fi
+}
+ 
+#右移一列
+function BoxRight()
+{
+        local x s
+        ((x = boxCurX + 1))
+        if BoxMove $boxCurY $x
+        then
+                s=`DrawCurBox 0`
+                ((boxCurX = x))
+                s=$s`DrawCurBox 1`
+                echo -ne $s
+        fi
+}
+ 
+ 
+#下落到底
+function BoxAllDown()
+{
+        local k j i x y iDown s
+        iDown=$iTrayHeight
+ 
+        #计算一共需要下落多少行
+        for ((j = 0; j < 8; j += 2))
+        do
+                ((i = j + 1))
+                ((y = ${boxCur[$j]} + boxCurY))
+                ((x = ${boxCur[$i]} + boxCurX))
+                for ((k = y + 1; k < iTrayHeight; k++))
+                do
+                        ((i = k * iTrayWidth + x))
+                        if (( ${iMap[$i]} != -1)); then break; fi
+                done
+                ((k -= y + 1))
+                if (( $iDown > $k )); then iDown=$k; fi
+        done
+ 
+        s=`DrawCurBox 0`        #将旧的方块抹去
+        ((boxCurY += iDown))
+        s=$s`DrawCurBox 1`        #显示新的下落后的方块
+        echo -ne $s
+        Box2Map                #将当前移动中的方块贴到背景方块中
+        RandomBox        #产生新的方块
+}
+ 
+ 
+#旋转方块
+function BoxRotate()
+{
+        local iCount iTestRotate boxTest j i s
+        iCount=${countBox[$iBoxCurType]}        #当前的方块经旋转可以产生的样式的数目
+ 
+        #计算旋转后的新的样式
+        ((iTestRotate = iBoxCurRotate + 1))
+        if ((iTestRotate >= iCount))
+        then
+                ((iTestRotate = 0))
+        fi
+ 
+        #更新到新的样式, 保存老的样式(但不显示)
+        for ((j = 0, i = (${offsetBox[$iBoxCurType]} + $iTestRotate) * 8; j < 8; j++, i++))
+        do
+                boxTest[$j]=${boxCur[$j]}
+                boxCur[$j]=${box[$i]}
+        done
+ 
+        if BoxMove $boxCurY $boxCurX        #测试旋转后是否有空间放的下
+        then
+                #抹去旧的方块
+                for ((j = 0; j < 8; j++))
+                do
+                        boxCur[$j]=${boxTest[$j]}
+                done
+                s=`DrawCurBox 0`
+ 
+                #画上新的方块
+                for ((j = 0, i = (${offsetBox[$iBoxCurType]} + $iTestRotate) * 8; j < 8; j++, i++))
+                do
+                        boxCur[$j]=${box[$i]}
+                done
+                s=$s`DrawCurBox 1`
+                echo -ne $s
+                iBoxCurRotate=$iTestRotate
+        else
+                #不能旋转，还是继续使用老的样式
+                for ((j = 0; j < 8; j++))
+                do
+                        boxCur[$j]=${boxTest[$j]}
+                done
+        fi
+}
+ 
+ 
+#DrawCurBox(bDraw), 绘制当前移动中的方块, bDraw为1, 画上, bDraw为0, 抹去方块。
+function DrawCurBox()
+{
+        local i j t bDraw sBox s
+        bDraw=$1
+ 
+        s=""
+        if (( bDraw == 0 ))
+        then
+                sBox="\040\040"
+        else
+                sBox="[]"
+                s=$s"\033[1m\033[7m\033[3${cBoxCur}m\033[4${cBoxCur}m"
+        fi
+ 
+        for ((j = 0; j < 8; j += 2))
+        do
+                ((i = iTrayTop + 1 + ${boxCur[$j]} + boxCurY))
+                ((t = iTrayLeft + 1 + 2 * (boxCurX + ${boxCur[$j + 1]})))
+                #\033[y;xH, 光标到(x, y)处
+                s=$s"\033[${i};${t}H${sBox}"
+        done
+        s=$s"\033[0m"
+        echo -n $s
+}
+ 
+ 
+#更新新的方块
+function RandomBox()
+{
+        local i j t
+ 
+        #更新当前移动的方块
+        iBoxCurType=${iBoxNewType}
+        iBoxCurRotate=${iBoxNewRotate}
+        cBoxCur=${cBoxNew}
+        for ((j = 0; j < ${#boxNew[@]}; j++))
+        do
+                boxCur[$j]=${boxNew[$j]}
+        done
+ 
+ 
+        #显示当前移动的方块
+        if (( ${#boxCur[@]} == 8 ))
+        then
+                #计算当前方块该从顶端哪一行"冒"出来
+                for ((j = 0, t = 4; j < 8; j += 2))
+                do
+                        if ((${boxCur[$j]} < t)); then t=${boxCur[$j]}; fi
+                done
+                ((boxCurY = -t))
+                for ((j = 1, i = -4, t = 20; j < 8; j += 2))
+                do
+                        if ((${boxCur[$j]} > i)); then i=${boxCur[$j]}; fi
+                        if ((${boxCur[$j]} < t)); then t=${boxCur[$j]}; fi
+                done
+                ((boxCurX = (iTrayWidth - 1 - i - t) / 2))
+ 
+                #显示当前移动的方块
+                echo -ne `DrawCurBox 1`
+ 
+                #如果方块一出来就没处放，Game over!
+                if ! BoxMove $boxCurY $boxCurX
+                then
+                        kill -$sigExit ${PPID}
+                        ShowExit
+                fi
+        fi
+ 
+ 
+ 
+        #清除右边预显示的方块
+        for ((j = 0; j < 4; j++))
+        do
+                ((i = iTop + 1 + j))
+                ((t = iLeft + 2 * iTrayWidth + 7))
+                echo -ne "\033[${i};${t}H        "
+        done
+ 
+        #随机产生新的方块
+        ((iBoxNewType = RANDOM % ${#offsetBox[@]}))
+        ((iBoxNewRotate = RANDOM % ${countBox[$iBoxNewType]}))
+        for ((j = 0, i = (${offsetBox[$iBoxNewType]} + $iBoxNewRotate) * 8; j < 8; j++, i++))
+        do
+                boxNew[$j]=${box[$i]};
+        done
+ 
+        ((cBoxNew = ${colorTable[RANDOM % ${#colorTable[@]}]}))
+ 
+        #显示右边预显示的方块
+        echo -ne "\033[1m\033[7m\033[3${cBoxNew}m\033[4${cBoxNew}m"
+        for ((j = 0; j < 8; j += 2))
+        do
+                ((i = iTop + 1 + ${boxNew[$j]}))
+                ((t = iLeft + 2 * iTrayWidth + 7 + 2 * ${boxNew[$j + 1]}))
+                echo -ne "\033[${i};${t}H[]"
+        done
+        echo -ne "\033[0m"
+}
+ 
+ 
+#初始绘制
+function InitDraw()
+{
+        clear
+        RandomBox        #随机产生方块，这时右边预显示窗口中有方快了
+        RandomBox        #再随机产生方块，右边预显示窗口中的方块被更新，原先的方块将开始下落
+        local i t1 t2 t3
+ 
+        #显示边框
+        echo -ne "\033[1m"
+        echo -ne "\033[3${cBorder}m\033[4${cBorder}m"
+ 
+        ((t2 = iLeft + 1))
+        ((t3 = iLeft + iTrayWidth * 2 + 3))
+        for ((i = 0; i < iTrayHeight; i++))
+        do
+                ((t1 = i + iTop + 2))
+                echo -ne "\033[${t1};${t2}H||"
+                echo -ne "\033[${t1};${t3}H||"
+        done
+ 
+        ((t2 = iTop + iTrayHeight + 2))
+        for ((i = 0; i < iTrayWidth + 2; i++))
+        do
+                ((t1 = i * 2 + iLeft + 1))
+                echo -ne "\033[${iTrayTop};${t1}H=="
+                echo -ne "\033[${t2};${t1}H=="
+        done
+        echo -ne "\033[0m"
+ 
+ 
+        #显示"Score"和"Level"字样
+        echo -ne "\033[1m"
+        ((t1 = iLeft + iTrayWidth * 2 + 7))
+        ((t2 = iTop + 10))
+        echo -ne "\033[3${cScore}m\033[${t2};${t1}HScore"
+        ((t2 = iTop + 11))
+        echo -ne "\033[3${cScoreValue}m\033[${t2};${t1}H${iScore}"
+        ((t2 = iTop + 13))
+        echo -ne "\033[3${cScore}m\033[${t2};${t1}HLevel"
+        ((t2 = iTop + 14))
+        echo -ne "\033[3${cScoreValue}m\033[${t2};${t1}H${iLevel}"
+        echo -ne "\033[0m"
+}
+ 
+ 
+#退出时显示GameOVer!
+function ShowExit()
+{
+        local y
+        ((y = iTrayHeight + iTrayTop + 3))
+        echo -e "\033[${y};0HGameOver!\033[0m"
+        exit
+}
+ 
+ 
+#显示用法.
+function Usage
+{
+        cat << EOF
+Usage: $APP_NAME
+Start tetris game.
+ 
+  -h, --help              display this help and exit
+      --version           output version information and exit
+EOF
+}
+ 
+ 
+#游戏主程序在这儿开始.
+if [[ "$1" == "-h" || "$1" == "--help" ]]; then
+        Usage
+elif [[ "$1" == "--version" ]]; then
+        echo "$APP_NAME $APP_VERSION"
+elif [[ "$1" == "--show" ]]; then
+        #当发现具有参数--show时，运行显示函数
+        RunAsDisplayer
+else
+        bash $0 --show&        #以参数--show将本程序再运行一遍
+        RunAsKeyReceiver $!        #以上一行产生的进程的进程号作为参数
+fi
+```
+</details>
+
+我没想到俄罗斯方块也有Shell版的，第一次发现的时候很惊讶，也很佩服这个作者，代码是完整版的，你可以直接复制粘贴拿去玩。
+
+</details>
+
+
+
+<!-- <details>
+	
+<summary>3st week</summary>
+
+### <span id="1">Algorithm</span>
+
+### Review
+
+### Tips
+
+### Share
+
+
+</details> -->
+
+
+<!-- 每周坚持ARTS 的目的，是为了刷完leetcode上大部分的题，和无障碍阅读英语文献。前者完成的标准很好判断，后者完成的标准，比如要阅读哪些英语文献、wiki上的还是技术博客、亦是英语原著，到时候再定，反正提高达到标准前期的道路是一样的，大量的翻译就可以了。 -->
