@@ -14,6 +14,7 @@ Do the above things every week
 - [1st Week](#1)
 - [2st Week](#2)
 - [3st week](#3)
+- [4st week](#4)
 
 这个目录是用来跳转到第N周的打卡记录(得先展开才能跳转)，防止以后内容多了浏览起来麻烦。
 
@@ -1360,6 +1361,203 @@ fi
 
 
 
+<details>
+	
+<summary>4st week</summary>
+
+### <span id="4">Algorithm</span>
+
+<details>
+	
+<summary>算法</summary>
+
+```
+26. Remove Duplicates from Sorted Array(Easy)
+
+Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.
+
+Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+
+Example 1:
+
+Given nums = [1,1,2],
+
+Your function should return length = 2, with the first two elements of nums being 1 and 2 respectively.
+
+It doesn't matter what you leave beyond the returned length.
+Example 2:
+
+Given nums = [0,0,1,1,1,2,2,3,3,4],
+
+Your function should return length = 5, with the first five elements of nums being modified to 0, 1, 2, 3, and 4 respectively.
+
+It doesn't matter what values are set beyond the returned length.
+Clarification:
+
+Confused why the returned value is an integer but your answer is an array?
+
+Note that the input array is passed in by reference, which means modification to the input array will be known to the caller as well.
+
+Internally you can think of this:
+
+// nums is passed in by reference. (i.e., without making a copy)
+int len = removeDuplicates(nums);
+
+// any modification to nums in your function would be known by the caller.
+// using the length returned by your function, it prints the first len elements.
+for (int i = 0; i < len; i++) {
+    print(nums[i]);
+}
+```
+</details>
+
+<details>
+	
+<summary>题解</summary>
+
+本题是使用in-place操作，在一个已排序的数组中删除多余的元素，返回非重复元素的个数。
+
+既然是in-place操作，意味着不能使用额外的空间复杂度，而且还是已排序的数组，自然就使用双指针来解了，跟第三周的算法题(27.Remove Element)差不多
+
+两个指针，第一个指针代表非重复的个数，第二个指针遍历数组，如果遇到非重复的个数，将其移动到左边，逐一累加。
+
+这样，当遍历整个数组之后，就将非重复的数移动到数组的左边，然后忽略掉数组右边的元素，返回第一个指针就相当于删掉多余的元素了。
+
+注意：最后的index+1，因为第一个指针从下标0开始，但是需要返回的是元素的长度，所以需要加1.
+
+```golang
+func removeDuplicates(nums []int) int {
+    if len(nums)==0{return 0}
+    
+    index:=0
+    for i:=1;i<len(nums);i++{
+        if nums[i]!=nums[index]{
+            index++
+            nums[index],nums[i]=nums[i],nums[index]
+        }
+    }
+    return index+1
+}
+```
+</details>
+
+### Review
+
+由于种种原因，上周的ARTS没做，到时候会找个时间补回来。
+
+最近在看 [effective go](https://golang.org/doc/effective_go.html),所以这周打算翻译effective go 中的一小部分，虽然很多内容没什么营养价值，但翻译使得我的英语提高速度快过囫囵吞枣式地阅读
+
+<details>
+	
+<summary>点击查看翻译内容</summary>
+
+# 介绍
+
+Go是一门新语言，虽然它从现有的语言中借鉴了一些特性，但它所拥有的特殊性使得，go程序会与之相近的语言所编写的程序不同。C++与Java的程序直接翻译到Go并不会输出满意的结果。另一方面，从go的角度考虑一个问题会产生一个成功但完全不同的程序，换句话说，为了写好go程序，明白它的特性和习语(idiom)很重要。同时明白go编程中的既定规范(established conventions)也是必要的，比如命名、格式化、程序结构等，也因为你遵循规范，写的程序才使得其他程序员更容易看懂。
+
+该文档给出了一些如何写出清晰、惯用的go代码技巧，它是 [language specification](https://golang.org/ref/spec), [the Tour of Go](https://tour.golang.org/),和 [How to Write Go Code](https://golang.org/doc/code.html) 的补充，所以阅读该文档之前先读这三个文档。
+
+**例子**
+
+[go源码包](https://golang.org/src/)不只是打算作为核心库服务，同时也是作为如何使用这门语言的例子。此外，许多包中还包含了完整的运行代码，你可以直接在https://golang.org/ 网站上运行，例如[这个](https://golang.org/pkg/strings/#example_Map)。如果你遇到了问题或想知道某些东西是怎么实现的，库中的文档、代码和例子会提供答案、思路、背景。
+
+# 格式化
+
+格式化是最受争议但也是最无关紧要的问题，人们可以编写不同格式的代码，但如果不是必须的，最好不要那么做。
+
+如果每个人都遵循相同的风格，那么专注于该主题的时间就会减少。但是问题是如何在没有很长的规定风格指南的情况下接近这个乌托邦呢。
+
+gofmt程序读取标准样式缩进和垂直对齐发出源代码，保留并在必要时重新格式化注释。如果你想知道如何处理一些新的布局问题，运行 gofmt，如果结果看起来不对劲，从新组织你的程序，再试着运行。
+
+这里有个例子，没有必要把时间花费在结构自字段注释的排列上，gofmt会自动帮你完成。
+
+```
+type T struct {
+    name string // name of the object
+    value int // its value
+}
+```
+gofmt会自动排列
+
+```
+type T struct {
+    name    string // name of the object
+    value   int    // its value
+}
+```
+
+所有在标准库中的源码都已经过gofmt排列过，
+
+gofmt格式化细节如下：
+
+缩进：
+
+gofmt使用tab作为默认缩进
+
+行长度：
+
+go中没有行长度限制，所以不用担心你的长度会超出，
+
+括号：
+
+go中不想c或java中那么多括号，控制流程(if for switch )语法中都不需要括号。同时运算符优先级层次也更简洁清晰，所以
+	
+	x<<8 + y<<16
+
+意味着间距的含义，不像其他语言(means what spacing implies,unlike ohter language,直译过来好奇怪)
+
+----
+
+吐槽一下其中一些句子，翻译的时候怎么译意思都不通顺，似乎不太符合上下文的意思，给人的感觉好奇怪：
+
+比如
+
+```
+Also, the operator precedence hierarchy is shorter and clearer, so
+x<<8 + y<<16
+means what the spacing implies, unlike in the other languages.
+```
+句子每个都单词都懂，前半句也没问题，但是后半句直译就成了：
+
+	x<<8 + y<<16意味着间隔的含义，不像其他语言
+
+</details>
+
+### Tips
+
+一开始，我以为在go中没有内置的一个数组直接拓展另一个数组的解决办法，需要用一个循环来解决，比如：
+
+```
+	arrA := []int{1, 2, 3}
+	arrB := []int{4, 5, 6}
+
+for i:=0;i<len(arrB);i++{
+	arrA=append(arrA,arrB[i])
+}
+```
+
+后来我发现一个神奇的东西，通过这种方式就可以直接拓展数组，注意就是在arrB后加三个点
+
+```
+	arrA := []int{1, 2, 3}
+	arrB := []int{4, 5, 6}
+	arrA=append(arrA,arrB...)
+```
+好神奇
+
+### Share
+
+本周的share打算分享一位大牛的博客：[Rob Pike](https://commandcenter.blogspot.com/),wiki了一下他的成就吓一大跳.
+
+- go语言的创始人之一
+- UTF-8 共同创造者之一
+- 贝尔实验室成员
+
+还有一大堆我虽然没听过，但肯定是很高的成就，仰慕之心油然而生，得找个时间好好翻他的博客才行，最好是翻烂的那种，以表心中的敬仰。
+
+
+</details>
+
 <!-- <details>
 	
 <summary>3st week</summary>
@@ -1374,6 +1572,4 @@ fi
 
 
 </details> -->
-
-
 <!-- 每周坚持ARTS 的目的，是为了刷完leetcode上大部分的题，和无障碍阅读英语文献。前者完成的标准很好判断，后者完成的标准，比如要阅读哪些英语文献、wiki上的还是技术博客、亦是英语原著，到时候再定，反正提高达到标准前期的道路是一样的，大量的翻译就可以了。 -->
