@@ -15,6 +15,9 @@ Do the above things every week
 - [2st Week](#2)
 - [3st week](#3)
 - [4st week](#4)
+- [5st week](#5)
+- [6st week](#6)
+
 
 这个目录是用来跳转到第N周的打卡记录(得先展开才能跳转)，防止以后内容多了浏览起来麻烦。
 
@@ -1557,8 +1560,56 @@ for i:=0;i<len(arrB);i++{
 
 还有一大堆我虽然没听过，但肯定是很高的成就，仰慕之心油然而生，得找个时间好好翻他的博客才行，最好是翻烂的那种，以表心中的敬仰。
 
+<details>
+    
+<summary>5st week</summary>
+
+### <span id="5">Algorithm</span>
+
+### Review
+
+### Tips
+
+### Share
 
 </details>
+
+<details>
+    
+<summary>6st week</summary>
+
+### <span id="6">Algorithm</span>
+
+### Review
+
+
+### Tips
+
+本周tips介绍一个iptables使用技巧，iptables是linux下的一与个网络过滤相关的命令，根据你定义的规则过滤掉一些数据。
+
+比如你在/var/log/secure 系统日志中看到某个ip多次ssh登陆失败，这很有可能是他想尝试暴力破解服务器的密码，你可以把他的ip给封了，这样他就无法破解了
+
+    iptables -A INPUT -s 123.234.224.231 -j DROP
+
+这样就可以了
+
+iptables是一个很强大的工具，可以定义很多网络的规则，比如可以可以尝试以下命令：
+
+    iptables -A INPUT -p icmp --icmp-type 8 -j DROP 
+
+这条命令的的意思是禁止别人ping你，它的实现原理是这样的，ping这个程序本质上是通过icmp协议发送一个请求，然后等待目的主机的回复
+。按照icmp报文格式，报文的第一个字段(type)为8的时候，代表的是请求报文。
+
+知道这一点后就好办了，你直接自定义一条规则，判断所有进来的数据包，如果是icmp协议，且type字段为8的，直接丢弃，这样就可以实现禁止别人ping你了，^_^。
+
+
+本周先粗略介绍以下iptables的使用，有空找个时间写个详细点的介绍。
+
+### Share
+
+
+</details>
+
 
 <!-- <details>
 	
@@ -1573,5 +1624,5 @@ for i:=0;i<len(arrB);i++{
 ### Share
 
 
-</details> -->
-<!-- 每周坚持ARTS 的目的，是为了刷完leetcode上大部分的题，和无障碍阅读英语文献。前者完成的标准很好判断，后者完成的标准，比如要阅读哪些英语文献、wiki上的还是技术博客、亦是英语原著，到时候再定，反正提高达到标准前期的道路是一样的，大量的翻译就可以了。 -->
+</details>
+<!-- 每周坚持ARTS 的目的，是为了刷完leetcode上大部分的题，和无障碍阅读英语文献。前者完成的标准很好判断，后者完成的标准，比如要阅读哪些英语文献、wiki上的还是技术博客、亦是英语原著，到时候再定，反正提高达到标准前期的道路是一样的，大量的翻译就可以了。
