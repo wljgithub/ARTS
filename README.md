@@ -11,8 +11,8 @@ Do the above things every week
 
 # Punch record
 
-- [1st Week](#1)
-- [2st Week](#2)
+- [1st week](#1)
+- [2st week](#2)
 - [3st week](#3)
 - [4st week](#4)
 - [5st week](#5)
@@ -1509,7 +1509,6 @@ go中不想c或java中那么多括号，控制流程(if for switch )语法中都
 
 意味着间距的含义，不像其他语言(means what spacing implies,unlike ohter language,直译过来好奇怪)
 
-----
 
 吐槽一下其中一些句子，翻译的时候怎么译意思都不通顺，似乎不太符合上下文的意思，给人的感觉好奇怪：
 
@@ -1560,27 +1559,439 @@ for i:=0;i<len(arrB);i++{
 
 还有一大堆我虽然没听过，但肯定是很高的成就，仰慕之心油然而生，得找个时间好好翻他的博客才行，最好是翻烂的那种，以表心中的敬仰。
 
+</details>
+
 <details>
     
 <summary>5st week</summary>
 
 ### <span id="5">Algorithm</span>
 
-### Review
+<details>
+    <summary>905. Sort Array By Parity(Easy)</summary>
 
-### Tips
+``` 
+Given an array A of non-negative integers, return an array consisting of all the even elements of A, followed by all the odd elements of A.
 
-### Share
+You may return any answer array that satisfies this condition.
+
+ 
+
+Example 1:
+
+Input: [3,1,2,4]
+Output: [2,4,3,1]
+The outputs [4,2,3,1], [2,4,1,3], and [4,2,1,3] would also be accepted.
+ 
+
+Note:
+
+1 <= A.length <= 5000
+0 <= A[i] <= 5000
+
+```
 
 </details>
 
 <details>
+    <summary>解法</summary>
+
+这道题是奇数和偶数分类，奇数放前面，偶数放后面，我一开始的思路是用双指针，一个指针从左开始遍历，一直往右直到遇到奇数才停下，一个指针从右开始，一直往左直到遇到偶数才停下，然后交换两个指针的元素，这样就能实现奇数全在左，偶数全在右了。但是遇到一种临界条件，比如[0,2,1],输出的结果为[0,1,2]。才发现这种思路行不通
+
+后来看一下解法的提示，提示用排序，然后自定义比排序的比较，然后我就用了冒泡排序(原谅我的水平，只能手写冒泡排序)，得出以下解法
+
+```
+func sortArrayByParity(A []int) []int {
+    if len(A) == 0 {
+        return A
+    }
+    for i := 0; i < len(A); i++ {
+        for j := 1; j < len(A)-i; j++ {
+            if A[j-1]%2 != 0 {
+                A[j-1], A[j] = A[j], A[j-1]
+            }
+        }
+    }
+    return A
+}
+```
+</details>
+
+### Review
+
+本周review分享Linux日志相关的内容
+<details>
+    <summary>点击即可展开</summary>
+
+在介绍Linux日志相关的内容之前，先来点开胃菜，比如有时候我们希望查看同时在线的用户，可以用 who命令,可以看到如下输出
+
+```bash
+root     pts/0        2019-06-14 09:42 (183.14.18.123)
+root     pts/1        2019-06-14 09:42 (183.14.18.321)
+root     pts/2        2019-06-15 09:39 (183.14.18.652)
+root     pts/3        2019-06-15 09:41 (183.14.18.132)
+```
+在centos中或debian中，who命令是从 /var/run/utmp日志文件中获取登陆用户信息。
+
+而如果你想查看root用户登陆的历史，可以用last命令，你会看到类似的输出：
+```bash
+root     pts/3        183.14.18.123     Sat Jun 15 09:41   still logged in   
+root     pts/2        183.14.18.149     Sat Jun 15 09:39   still logged in   
+root     pts/4        183.14.18.151     Fri Jun 14 16:20 - 19:00  (02:40)    
+root     pts/4        183.14.18.152     Fri Jun 14 14:49 - 16:20  (01:30)    
+```
+
+> 这里顺便介绍一个小技巧，比如你想查看系统重启的记录，可以使用这条命令 last reboot
+
+而如果想查看所有用户最近一次的登陆时间，可以用lastlog命令，你会看到类似的输出：
+
+```
+Username         Port     From             Latest
+root             pts/0    183.66.77.88    Tue Jun 18 09:40:20 +0800 2019
+bin                                        **Never logged in**
+daemon                                     **Never logged in**
+adm                                        **Never logged in**
+lp                                         **Never logged in**
+sync                                       **Never logged in**
+shutdown                                   **Never logged in**
+halt                                       **Never logged in**
+mail                                       **Never logged in**
+operator                                   **Never logged in**
+games                                      **Never logged in**
+ftp                                        **Never logged in**
+nobody                                     **Never logged in**
+systemd-network                            **Never logged in**
+dbus                                       **Never logged in**
+polkitd                                    **Never logged in**
+ntp                                        **Never logged in**
+sshd                                       **Never logged in**
+postfix                                    **Never logged in**
+chrony                                     **Never logged in**
+tss                                        **Never logged in**
+jack       pts/0                     Tue Jun 18 09:49:04 +0800 2019
+
+```
+
+
+开胃菜讲完了，下面来进入主题，介绍一下如系统日志相关的内容，主要包含如下方面：
+
+- 系统日志是怎么产生的
+- 产生的系统日志都去了哪里
+- 日志的组成部分有哪些，如何查看
+- 介绍日志的规则，即日志的来源和去处(来源意味着需要记录哪些进程产生的记录，去处是指这些记录需要重定向到终端还是写入日志文件中
+)
+- 最后通过一个完整的例子，教你如何自定义规则，并产生一条日志，然后可在文件中查看(包含完整的命令)
+
+### 系统日志是怎么产生的
+
+系统日志的是由一个叫rsyslog的守护进程，它会监听系统的各个模块所生成的消息，比如用户通过ssh登陆的时候，操作系统的sshd模块会生产一条类似这样的记录
+
+    pam_unix(sshd:session): session opened for user root by (uid=0)
+
+然后rsyslog会将这条记录存入到系统特定的目录中
+
+### 产生的日志都去了哪里
+
+你们会不会好奇，系统生产的日志都去了什么地方，它其实存放在/var/log中(centOS),如果你用 ls /var/log，就会看到如下输出：
+
+```
+anaconda           btmp           dmesg       grubby              maillog            myTestInfo.log  secure            tallylog
+boot.log           chrony         dmesg.old   grubby_prune_debug  maillog-20190616   ntpstats        secure-20190616   tuned
+boot.log-20190614  cron           ethcon.log  imageboot.log       messages           qemu-ga         spooler           wtmp
+boot.log-20190617  cron-20190616  firewalld   lastlog             messages-20190616  rhsm            spooler-20190616  yum.log
+```
+可以看到里面包含了许多日志文件
+
+### 日志的组成部分由哪些
+
+我们先来看一下具体系统日志的长什么样：
+
+```
+Jun 17 10:12:13 vultr sshd[21546]: pam_succeed_if(sshd:auth): requirement "uid >= 1000" not met by user "root"
+Jun 17 10:12:14 vultr sshd[21546]: Failed password for root from 218.92.0.206 port 33909 ssh2
+```
+先说一下，这是一条很有意思的记录，这条记录的意思是218.92.0.206这个ip的人，尝试用root用户登陆我的主机，我不知道他是登陆的时候输错IP，还是想暴力破解我的服务器密码，反正我看到的时候吓一跳。
+
+好了，接着说日志的格式，日志由四个部分组成，分别是：日期+主机名+模块+日志信息
+
+格式|实例
+-|-|
+日期|Jun 17 10:12:14|
+主机名|vultr|
+模块|sshd[21546] |
+日志信息|Failed password for root from 218.92.0.206 port 33909 ssh2|
+
+
+
+每条日志都会标明时间，主机，和产生日志的模块，所以你可以很清晰地区别这条日志是什么时候产生的，由谁产生的。
+
+### 日志规则介绍
+
+前面介绍了日志是怎么来的，也介绍了日志都去了哪里，即日志的来源和去处都介绍了。你会不会有那么一点冲动，自己定义日志的来源和去处，你可以指使日志从哪里来，到哪里去。
+
+下面我给你介绍一下，如何定义日志的来源和去处。
+
+其实系统定义日志的规则，是放在/etc/rsyslog.conf文件种，我摘抄其中一段给你介绍一下日志的规则
+
+```
+cron.info                                               /var/log/cron
+auth.*                                                  @prep.ai.mit.edu
+auth.*                                                  root,amrood
+```
+
+可以看到日志分两个部分，左边的部分就是日志的来源，来源分中也分两个部分，格式为：设备+日志级别
+
+比如cron.info ，cron是指产生日志的设备(facility),info是指日志的级别
+
+去处就简单了，就一个部分，你可以指定本地的一个文件，也可以指定远程的一台服务器，比如 @prep.ai.mit.edu 或/var/log/cron
+
+好了，规则你知道了，下面列个表，详细地介绍各个部分
+
+### 例子
+
+下面通过一个具体的例子，向你介绍如果自定义日志规则，并产生一条日志消息。
+
+**第一步，定义日志规则**
+
+在 /etc/rsyslog.d/下创建一个文件，名字你随便取，在这里我用myLogRules.conf，你可以直接复制以下命令(centOS)
+
+```bash
+vim /etc/rsyslog.d/myLogRules.conf
+```
+
+然后输入以下内容
+
+    *.info  /var/log/myTestInfo.log
+
+退出保存(:wq)
+
+**第二步，重启rsyslog守护进程**
+
+```bash
+service rsyslog restart
+```
+
+**第三步，生成一条日志**
+
+    logger -p local4.info " This is a info message from local 4"
+
+好了，你已经生成了一条日志消息了，输入以下命令：
+
+     tail /var/log/myTestInfo.log
+
+你可以在/var/log/myTestInfo.log文件了看到如下日志
+```
+Jun 19 10:31:40 vultr root: This is a info message from local 4
+
+```
+
+到目前为止，我们已经介绍了日志是怎么产生的，产生的日志都去了哪里，日志由哪几部分组成，还介绍了如何自定义日志的来源和去处，并通过了一个具体的例子向你介绍如何实现这个过程，虽然我认为还有一些内容没有在这个review里介绍到(因为我自己都没搞懂，包括我查了一些文档也没有清晰地介绍这个，就是自定义日志的action中，如果不填用户是不是默认是所有用户都能查看，如果指定用户又会怎样)，但我感觉已经大致框架还是很清晰的，下次有空再详细介绍跟日志相关的内容，上周ARTS总算补全了。
+
+本周review来源于这篇[文章](https://www.digitalocean.com/community/tutorials/how-to-view-and-configure-linux-logs-on-ubuntu-and-centos)并加以整理，你可以跳转到原文查看详细的介绍
+</details>
+
+### Tips
+中间由于种种原因，缺了很多周的ARTS，从这周开始接上，本周的Tips分享linux下如何在一堆字符串中过滤无用的，并取出想要的字段
+
+比如当我们想kill掉某个进程的时候，都会通过ps命令然后查找其PID
+你可以通过这种方式，然后手动复制其PID
+
+```bash
+bash-4.2# ps aux|grep top
+root     33457  0.1  0.0 161972  2292 pts/3    S+   12:55   0:00 top
+root     33463  0.0  0.0 112704   960 pts/2    S+   12:55   0:00 grep --color=auto top
+```
+但是作为一个程序员，有一种更优雅的方式，一条命令就能搞定
+
+    kill -9 $(ps aux|grep top|grep -v color|awk -F ' ' '{print $2}')
+
+如果你想kill掉其他程序，把top改成你想kill掉的程序即可，比如如果你想kill掉mysql就改为：
+
+    kill -9 $(ps aux|grep mysql|grep -v color|awk -F ' ' '{print $2}')
+
+> 即使开了多个同样的程序也会全都被killed掉
+
+
+
+
+下面来一步步解释一下上述命令，先输入ps aux，然后出现以下结果
+```bash
+ps aux
+root     34532  0.0  0.0 161972  2296 pts/3    S+   13:09   0:00 top
+root     34535  0.0  0.0 161972  2292 pts/2    S+   13:09   0:00 top
+root     34540  0.0  0.0 112704   960 pts/4    S+   13:09   0:00 grep --color=auto top
+```
+
+> 记住，我们的目的是要取出PID，及每一行的第二个字段。为了达到这个目的，我们需要做如下事情：
+
+- 过滤掉无关的PID，比如第三行的PID就不是我们想要的
+- 取出每行的第二个字段
+
+第一步，过滤无关PID我们可以这么写
+
+    ps aux|grep top|grep -v color
+
+即通过grep -v color这条命令，然后你将会看到以下内容
+
+```bash
+root     34532  0.1  0.0 161972  2088 pts/3    S+   13:09   0:00 top
+root     34535  0.1  0.0 161972  2084 pts/2    S+   13:09   0:00 top
+```
+
+第二步，取每一行的第二个字段，可以用过awk命令
+
+    ps aux|grep mysql|grep -v color|awk -F ' ' '{print $2}' 
+
+解释一下 -F <code>' '</code>为分隔符的意思,即以空格符为分隔符，然后'{print $2}' 输出第二个字段
+
+这条命令会显示以下结果：
+```
+34532
+34535
+```
+这就是我们要找的PID了
+
+完整的命令合起来就是：
+
+    kill -9 $(ps aux|grep top|grep -v color|awk -F ' ' '{print $2}')
+
+$()这个符号在这里的意思就是命令置换，即将最后过滤剩下的PID作为kill命令的参数。
+
+### Share
+
+本周share分享一个golang中的小技巧，本来我以为golang中是无法删除slice中的元素的，但是google了一下，在stackoverflow里找到一个令我拍案叫绝的写法
+
+比如一个slice [1,2,3,4,5,6],你想删除里面的一个元素，假设我要删除5把，可以这么写：
+
+```golang
+package main
+
+import "fmt"
+
+func main() {
+    s := []int{1, 2, 3, 4, 5, 6}
+
+    for i, v := range s {
+        if v == 5 {
+            s = append(s[:i], s[i+1:]...)
+        }
+        fmt.Println(s)
+    }
+}
+
+```
+代码是完整的，你可以复制粘贴去跑一下。
+
+最核心的是这一句 s = append(s[:i], s[i+1:]...),第一眼看到我真的佩服得五体投地，我没想到切片的索引还能这么用，而且还用上s[i+1]... 这个语法，太牛逼了。反正对我这种新手来说，这完全颠覆我的之前对go的运用。读取来就跟读诗的感觉，amazing。
+
+抱歉，搞得我就跟山里人进城的一样，原谅我毫不吝啬地表达对这群充满智慧的人的仰慕之情。
+
+
+</details>
+
+
+<details>
+
     
 <summary>6st week</summary>
 
 ### <span id="6">Algorithm</span>
 
+<details>
+    
+<summary>题目</summary>
+
+>Write a function to delete a node (except the tail) in a singly linked list, given only access to that node.
+
+>Given linked list -- head = [4,5,1,9], which looks like following:
+
+
+
+ 
+
+
+>Example 1:
+
+>Input: head = [4,5,1,9], node = 5
+>Output: [4,1,9]
+>Explanation: You are given the second node with value 5, the linked list should become 4 -> 1 -> 9 after calling your function.
+
+>Example 2:
+
+>Input: head = [4,5,1,9], node = 1
+>Output: [4,5,9]
+>Explanation: You are given the third node with value 1, the linked list should become 4 -> 5 -> 9 after calling your function.
+ 
+
+>Note:
+
+>The linked list will have at least two elements.
+>All of the nodes' values will be unique.
+>The given node will not be the tail and it will always be a valid node of the linked list.
+>Do not return anything from your function. 
+</details>
+
+<details>
+    
+<summary>解法</summary>
+
+题目的意思是给出链表中的一个节点，把这个节点删除，而且该节点都是都是不是尾节点，所以就很简单了，只需要把下一个的值取出来替换现在的值，然后再将下一个节点指向下下个节点即可，这样就相当于把当前节点给删了。
+
+```golang
+/**
+ * Definition for singly-linked list.
+ * type ListNode struct {
+ *     Val int
+ *     Next *ListNode
+ * }
+ */
+func deleteNode(node *ListNode) {
+    if node==nil||node.Next ==nil{
+        return
+    }
+    
+    next := node.Next
+    node.Val = next.Val
+    node.Next = next.Next 
+}
+```
+</details>
+
 ### Review
+
+本周review介绍如何在linux系统下设定一些定时任务，比如每天中午十二点打印"hello,world!",可以这么写
+
+1. 打开终端，在命令行中输入以下命令
+```
+crontab -e
+```
+2. 把这条命令粘贴到文件末尾
+```
+0 12 * * * echo "hello,world!"
+```
+3. 退出保存即可
+
+解释一下一条命令，其实很简单 0 12 * * * 分别代表： 分钟:小时:一个月的第几天:一年中的第几月:一个星期中的第几天,或者看下面这个表格会更清晰一些
+
+```bash
+* * * * *  Command_to_execute
+- � � � -
+| | | | |
+| | | | +�� Day of week (0�6) (Sunday=0) or Sun, Mon, Tue,...
+| | | +���- Month (1�12) or Jan, Feb,...
+| | +����-� Day of month (1�31)
+| +������� Hour (0�23)
++��������- Minute (0�59)
+```
+
+当然，如果你需要指定很多任务，一条命令无法满足，那么可以写在一个shell脚本里，然后执行这个shell脚本即可
+
+比如每天0点执行test.sh脚本，可以这么写(需要附上这个脚本的路径),
+
+```bash
+0 0 * * * /root/test.sh
+```
+更详细的可以参考[这里](https://www.tutorialspoint.com/unix_commands/crontab.htm)
 
 
 ### Tips
@@ -1607,15 +2018,19 @@ iptables是一个很强大的工具，可以定义很多网络的规则，比如
 
 ### Share
 
+本周share分享一个有意思的东西，其实也算是老掉牙的技术了，就是平时上班是用钉钉打卡，人事部的把打卡范围设置在公司100米以内，只有进入了这个区域点击打卡才算打卡成功。我一听到这个消息的时候，顿时笑出声来，同事还问我怎么了，我说没事。其实我心里在想，这还不简单吗，弄个GPS修改器，把定位调到公司范围内不就可以随时打卡了。
+
+然后今天回来稍微弄了一下，去google paly下一个叫Fake GPS的软件，找到公司的地址，然后打开钉钉定位的时候，有偏差，我微调了一下，然后就可以实现在家里打卡了。说实话，弄这个东西也不是为了逃避迟到，只是单纯地觉得从技术层面来说这是一个很有意思的想法，然后就去实现罢了。
+
+最后还用了百度和高德地图测了一下定位，发现可以修改高德地图的当前位置，而百度地址怎么修改GPS都没用，不知道用了什么技术能识别我真实的位置，牛批。
 
 </details>
 
-
 <!-- <details>
-	
-<summary>3st week</summary>
+    
+<summary>5st week</summary>
 
-### <span id="1">Algorithm</span>
+### <span id="5">Algorithm</span>
 
 ### Review
 
@@ -1623,6 +2038,11 @@ iptables是一个很强大的工具，可以定义很多网络的规则，比如
 
 ### Share
 
-
 </details>
+
+<details>
+
+
 <!-- 每周坚持ARTS 的目的，是为了刷完leetcode上大部分的题，和无障碍阅读英语文献。前者完成的标准很好判断，后者完成的标准，比如要阅读哪些英语文献、wiki上的还是技术博客、亦是英语原著，到时候再定，反正提高达到标准前期的道路是一样的，大量的翻译就可以了。
+
+
