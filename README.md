@@ -17,6 +17,7 @@ Do the above things every week
 - [4st week](#4)
 - [5st week](#5)
 - [6st week](#6)
+- [7st week](#7)
 
 
 这个目录是用来跳转到第N周的打卡记录(得先展开才能跳转)，防止以后内容多了浏览起来麻烦。
@@ -26,7 +27,6 @@ Do the above things every week
 &nbsp;
 &nbsp;
 
- 
 
 <details>
 	<summary>1st week(点击即可展开)</summary>
@@ -2025,6 +2025,28 @@ iptables是一个很强大的工具，可以定义很多网络的规则，比如
 最后还用了百度和高德地图测了一下定位，发现可以修改高德地图的当前位置，而百度地址怎么修改GPS都没用，不知道用了什么技术能识别我真实的位置，牛批。
 
 </details>
+
+
+<details>
+    
+<summary>7st week</summary>
+
+### <span id="7">Algorithm</span>
+
+### Review
+
+### Tips
+
+### Share
+
+
+本周阅读文章:
+
+- [我是怎么招聘程序员的](https://coolshell.cn/articles/1870.html)
+- [来信， 创业 和 移动互联网](https://coolshell.cn/articles/5815.html)
+
+</details>
+
 
 <!-- <details>
     
